@@ -1,28 +1,25 @@
 import os
-from functions.get_files_info import get_file_content
+from functions.run_python import run_python_file
 
-print("--- Running get_files_content tests ---")
 
-# Test Case 1: get_files_content("calculator", "main.py")
-print("\nget_files_content('calculator', 'main.py')")
-result1 = get_file_content("calculator", "main.py")
-print("Result for main.py")
-print(result1)
+# --- New Test Cases for run_python_file ---
 
-# Test Case 2: get_files_content("calculator", "pkg")
-print("\nget_files_content('calculator', 'pkg/calculator.py')")
-result2 = get_file_content("calculator", "pkg/calculator.py")
-print("Result for 'pkg/calculator.py'")
-print(result2)
+print("--- Test Case 1: Displaying calculator usage ---")
+print(run_python_file("calculator", "main.py"))
+print("\n")
 
-# Test Case 3: get_files_content("calculator", "/bin.cat")
-print("\nget_files_content('calculator', '/bin/cat')")
-result3 = get_file_content("calculator", "/bin/cat")
-print("Result for '/bin/cat'")
-print(result3)
+print("--- Test Case 2: Running calculator with an expression ---")
+print(run_python_file("calculator", "main.py", ["3 + 5"]))
+print("\n")
 
-# Test Case 4: get_files_info("calculator", "pkg/does_not_exist.py")
-print("\nget_files_content('calculator', 'pkg/does_not_exist.py')")
-result4 = get_file_content("calculator", "pkg/does_not_exist.py")
-print("Result for 'pkg/doesnotexist'")
-print(result4)
+print("--- Test Case 3: Running a different Python file (calculator/tests.py) ---")
+print(run_python_file("calculator", "tests.py"))
+print("\n")
+
+print("--- Test Case 4: Attempting to run a file outside the working directory (should error) ---")
+print(run_python_file("calculator", "../main.py"))
+print("\n")
+
+print("--- Test Case 5: Attempting to run a nonexistent file (should error) ---")
+print(run_python_file("calculator", "nonexistent.py"))
+print("\n")
