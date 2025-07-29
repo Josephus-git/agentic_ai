@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import sys
 from google.genai import types
 from functions.get_files_info import available_functions
-from functions.call_function import call_function 
+from call_function import call_function 
 
 
 def main():
@@ -58,15 +58,21 @@ All paths you provide should be relative to the working directory. You do not ne
     if not response.function_calls:
         return response.text
 
+    function_responses = []
     for function_call_part in response.function_calls:
         function_call_result = call_function(function_call_part, verbose)
-        if not function_call_result:
-            raise RuntimeError("Fatal: call_function did not return expected types.Content structure with function_response.response")
-        
+        if (
+            not function_call_result.parts
+            or not function_call_result.parts[0].function_response
+        ):
+            raise Exception("empty function call result")
         if verbose:
             print(f"-> {function_call_result.parts[0].function_response.response}")
-        else:
-            "not verbose"
+        function_responses.append(function_call_result.parts[0])
+
+    if not function_responses:
+        raise Exception("no function responses generated, exiting.")
+
 
 
 

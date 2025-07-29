@@ -1,8 +1,9 @@
 import google.genai.types as types
-from .get_file_content import get_file_content
-from .get_files_info import get_files_info
-from .run_python import run_python_file
-from .write_file import write_file
+from functions.get_file_content import get_file_content
+from functions.get_files_info import get_files_info
+from functions.run_python import run_python_file
+from functions.write_file import write_file
+from config import WORKING_DIR
 
 def call_function(function_call_part: types.FunctionCall, verbose=False):
     # Print function call information based on verbose flag
@@ -12,7 +13,7 @@ def call_function(function_call_part: types.FunctionCall, verbose=False):
         print(f" - Calling function: {function_call_part.name}")
 
     # Manually add the "working_directory" argument
-    function_call_part.args["working_directory"] = "./calculator"
+    function_call_part.args["working_directory"] = WORKING_DIR
 
     # Dictionary of function name -> function object
     available_functions = {
