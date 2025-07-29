@@ -53,9 +53,58 @@ schema_get_files_info = types.FunctionDeclaration(
     ),
 )
 
+schema_get_file_content = types.FunctionDeclaration(
+    name="get_file_content",
+    description="gets file content in the specified file path",
+    parameters=types.Schema(
+    type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file_path to get file content from relative to the working directory. If not provided, gets file in the working directory itself."
+            ),
+        },
+    ),
+)
+
+schema_run_python_file = types.FunctionDeclaration(
+    name="run_python_file",
+    description="runs python file in the specified file_path",
+    parameters=types.Schema(
+    type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file_path to get file content from relative to the working directory. If not provided, gets file in the working directory itself."
+            ),
+        },
+    ),
+)
+
+schema_write_file = types.FunctionDeclaration(
+    name="write_file",
+    description="write file in the specified file path",
+    parameters=types.Schema(
+    type=types.Type.OBJECT,
+        properties={
+            "file_path": types.Schema(
+                type=types.Type.STRING,
+                description="The file path to get file content from relative to the working directory. If not provided, gets file in the working directory itself."
+            ),
+            "content": types.Schema(
+                type=types.Type.STRING,
+                description="content to write to file."
+            ),
+        },
+    ),
+)
+
 available_functions = types.Tool(
     function_declarations=[
         schema_get_files_info,
+        schema_get_file_content,
+        schema_run_python_file,
+        schema_write_file,
     ]
 )        
         

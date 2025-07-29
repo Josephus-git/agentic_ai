@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 import sys
 from google.genai import types
 from functions.get_files_info import available_functions
+from functions.call_function import call_function 
 
 
 def main():
@@ -17,6 +18,9 @@ You are a helpful AI coding agent.
 When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
 
 - List files and directories
+- Read file contents
+- Execute Python files with optional arguments
+- Write or overwrite files
 
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
@@ -50,11 +54,20 @@ All paths you provide should be relative to the working directory. You do not ne
         print("Prompt tokens:", response.usage_metadata.prompt_token_count)
         print("Response tokens:", response.usage_metadata.candidates_token_count)
     print("Response:")
-    if len(response.function_calls) > 0:
-        for function_call_part in response.function_calls:
-            print(f"Calling function: {function_call_part.name}({function_call_part.args})")
-    else: 
-        print(response.text)
+ 
+    if not response.function_calls:
+        return response.text
+
+    for function_call_part in response.function_calls:
+        function_call_result = call_function(function_call_part, verbose)
+        if not function_call_result:
+            raise RuntimeError("Fatal: call_function did not return expected types.Content structure with function_response.response")
+        
+        if verbose:
+            print(f"-> {function_call_result.parts[0].function_response.response}")
+        else:
+            "not verbose"
+
 
 
 if __name__ == "__main__":
