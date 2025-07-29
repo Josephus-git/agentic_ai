@@ -1,5 +1,5 @@
 import os
-from .config import MAX_CHARS
+import google.genai.types as types
 
 def get_files_info(working_directory, directory="."):
     """
@@ -39,33 +39,23 @@ def get_files_info(working_directory, directory="."):
         return f"Error: An unexpected error occurred: {str(e)}"
     
 
-def get_file_content(working_directory, file_path):
-    full_path = os.path.join(working_directory, file_path)
-    full_path = os.path.abspath(full_path)
+schema_get_files_info = types.FunctionDeclaration(
+    name="get_files_info",
+    description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
+    parameters=types.Schema(
+        type=types.Type.OBJECT,
+        properties={
+            "directory": types.Schema(
+                type=types.Type.STRING,
+                description="The directory to list files from, relative to the working directory. If not provided, lists files in the working directory itself.",
+            ),
+        },
+    ),
+)
 
-    # Validate that the full_path stays within the working_directory boundaries
-    if not full_path.startswith(os.path.abspath(working_directory)):
-        return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
-    
-    if not os.path.isfile(full_path):
-            return f'Error: File not found or is not a regular file: "{full_path}"'
-    
-    try:
-        with open(full_path, "r") as f:
-            full_content = f.read()
-
-        if len(full_content) > MAX_CHARS:
-            file_content_string = full_content[:MAX_CHARS] + f"[...File \"{full_path}\" truncated at {MAX_CHARS} characters]"
-        else:
-            file_content_string = full_content
-
-    except FileNotFoundError:
-        return f"Error: File not found at '{full_path}'"
-
-    except Exception as e:
-        return f"Error reading file '{full_path}': {e}"
-
-    return file_content_string
-
-        
+available_functions = types.Tool(
+    function_declarations=[
+        schema_get_files_info,
+    ]
+)        
         
