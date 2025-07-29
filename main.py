@@ -5,6 +5,7 @@ import sys
 from google.genai import types
 from functions.get_files_info import available_functions
 from call_function import call_function 
+from prompts import system_prompt
 
 
 def main():
@@ -12,24 +13,13 @@ def main():
     api_key = os.environ.get("GEMINI_API_KEY")
     client = genai.Client(api_key=api_key)
 
-    system_prompt = """
-You are a helpful AI coding agent.
-
-When a user asks a question or makes a request, make a function call plan. You can perform the following operations:
-
-- List files and directories
-- Read file contents
-- Execute Python files with optional arguments
-- Write or overwrite files
-
-All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
-"""
-
-    model_name = "gemini-2.0-flash-001"
+    
 
     input = sys.argv
     if len(input) < 2:
-        print("usage: uv run main.py <command>")
+        print("AI Code Assistant")
+        print('\nUsage: python main.py "your prompt here" [--verbose]')
+        print('Example: python main.py "How do I fix the calculator?"')
         os._exit(1)
 
     user_prompt = input[1]
@@ -38,19 +28,25 @@ All paths you provide should be relative to the working directory. You do not ne
         if input[2] == "--verbose":
             verbose = True
 
+    if verbose:
+        print("User prompt:", user_prompt)
+
     messages = [
     types.Content(role="user", parts=[types.Part(text=user_prompt)]),
     ]
 
+    generate_content(client, messages, verbose)
+
+
+def generate_content(client, messages, verbose):
     response = client.models.generate_content(
-        model=model_name,
+        model="gemini-2.0-flash-001",
         contents=messages,
         config=types.GenerateContentConfig(
             tools=[available_functions], system_instruction=system_prompt
             ),
     )
     if verbose:
-        print("User prompt:", user_prompt)
         print("Prompt tokens:", response.usage_metadata.prompt_token_count)
         print("Response tokens:", response.usage_metadata.candidates_token_count)
     print("Response:")
